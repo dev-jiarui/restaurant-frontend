@@ -1,0 +1,32 @@
+{
+  "name": "restaurant-frontend",
+  "version": "1.0.0",
+  "description": "希尔顿餐厅预订系统前端",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "docker:build": "docker build -t restaurant-frontend .",
+    "docker:run": "docker run -p 80:80 restaurant-frontend",
+    "docker:compose": "docker-compose up -d",
+    "docker:compose:build": "docker-compose up -d --build"
+  },
+  "dependencies": {
+    "@solidjs/router": "^0.8.3",
+    "solid-js": "^1.8.11"
+  },
+  "devDependencies": {
+    "@solidjs/testing-library": "^0.8.5",
+    "@types/node": "^20.10.5",
+    "@vitest/coverage-v8": "^1.1.0",
+    "@vitest/ui": "^1.1.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-solid": "^2.8.2",
+    "vitest": "^1.1.0"
+  }
+}

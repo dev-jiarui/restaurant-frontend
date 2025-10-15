@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - restaurant-network
+
+  backend:
+    build: ../order-system
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/restaurant
+    depends_on:
+      - mongo
+    networks:
+      - restaurant-network
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - restaurant-network
+
+volumes:
+  mongo-data:
+
+networks:
+  restaurant-network:
+    driver: bridge
