@@ -63,7 +63,7 @@ VITE_APP_NAME=希尔顿餐厅预订系统
 VITE_APP_VERSION=1.0.0
 
 # 开发配置
-VITE_DEV_PORT=5173
+VITE_DEV_PORT=3001
 VITE_DEV_HOST=localhost
 
 # 调试配置
@@ -156,7 +156,7 @@ cp .env.example .env
 | `VITE_API_BASE_URL` | 后端 API 地址 | `http://localhost:3002/api` | 是 |
 | `VITE_APP_NAME` | 应用名称 | `希尔顿餐厅预订系统` | 否 |
 | `VITE_APP_VERSION` | 应用版本 | `1.0.0` | 否 |
-| `VITE_DEV_PORT` | 开发服务器端口 | `5173` | 否 |
+| `VITE_DEV_PORT` | 开发服务器端口 | `3001` | 否 |
 | `VITE_DEV_HOST` | 开发服务器主机 | `localhost` | 否 |
 | `VITE_DEBUG` | 调试模式 | `true` | 否 |
 | `VITE_LOG_LEVEL` | 日志级别 | `debug` | 否 |
