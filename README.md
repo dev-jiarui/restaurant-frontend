@@ -222,3 +222,26 @@ npm run build
 - 组件采用函数式编程风格
 - 使用 CSS-in-JS 或 CSS Modules
 
+
+
+## 页面截图
+- 预定管理页面
+  <img width="2502" height="1588" alt="image" src="https://github.com/user-attachments/assets/41230bcb-c37a-4b6a-ba82-100b61b27baa" />
+
+- 登录页面
+  <img width="742" height="1302" alt="image" src="https://github.com/user-attachments/assets/03f03586-cf3c-42ee-8fa4-0ae627d1b6ab" />
+
+- 注册页面
+  <img width="734" height="1708" alt="image" src="https://github.com/user-attachments/assets/a93c4afe-150f-4fbe-ac3b-e04c757861a9" />
+
+- 预定页面
+  <img width="1366" height="1676" alt="image" src="https://github.com/user-attachments/assets/0dacd555-6c76-453e-ba6c-5344e94bef3a" />
+
+- 我的预定
+  <img width="2440" height="1276" alt="image" src="https://github.com/user-attachments/assets/e03817c7-be89-46fb-8686-14899705e1fa" />
+
+- 预定详情
+  <img width="2482" height="1860" alt="image" src="https://github.com/user-attachments/assets/57495262-0ebc-4b22-b360-079fe116c662" />
+
+
+
