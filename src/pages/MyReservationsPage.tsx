@@ -2,7 +2,7 @@ import { Component, createSignal, createEffect, For, Show } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { Reservation, ReservationFormData } from '@/types';
 import { apiClient } from '@/services/api';
-import { formatDateTime, formatReservationStatus, getStatusColorClass, canEditReservation, canCancelReservation } from '@/utils/format';
+import { formatDateTime, formatReservationStatus, getStatusColorClass, canEditReservation, canCancelReservation, formatDateTimeForInput } from '@/utils/format';
 import { validateForm, reservationValidationRules } from '@/utils/validation';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Modal from '@/components/Modal';
@@ -61,11 +61,29 @@ const MyReservationsPage: Component = () => {
   // 打开编辑模态框
   const openEditModal = (reservation: Reservation) => {
     setSelectedReservation(reservation);
+    
+    // 安全地处理日期转换，使用本地时间格式
+    let formattedArrivalTime = '';
+    try {
+      const arrivalDate = new Date(reservation.arrivalTime);
+      if (isNaN(arrivalDate.getTime())) {
+        console.error('Invalid arrival time:', reservation.arrivalTime);
+        setError('预订时间数据无效，无法编辑此预订');
+        return;
+      }
+      // 使用专门的函数格式化为datetime-local输入框格式（本地时间）
+      formattedArrivalTime = formatDateTimeForInput(reservation.arrivalTime);
+    } catch (error) {
+      console.error('Error parsing arrival time:', error, reservation.arrivalTime);
+      setError('预订时间格式错误，无法编辑此预订');
+      return;
+    }
+    
     setEditFormData({
       guestName: reservation.guestName,
       phoneNumber: reservation.phoneNumber,
       email: reservation.email,
-      arrivalTime: new Date(reservation.arrivalTime).toISOString().slice(0, 16),
+      arrivalTime: formattedArrivalTime,
       tableSize: reservation.tableSize,
       specialRequests: reservation.specialRequests || ''
     });

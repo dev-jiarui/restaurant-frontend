@@ -1,5 +1,6 @@
 import { ApiResponse, User, Reservation, LoginFormData, ReservationFormData, PaginatedResponse } from '@/types';
 import { encodePassword } from '@/utils/crypto';
+import { graphqlClient } from './graphql';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
@@ -57,6 +58,16 @@ class ApiClient {
       const data = await response.json();
 
       if (!response.ok) {
+        // 检查是否是认证错误
+        if (response.status === 401 || 
+            data.code === 'TOKEN_EXPIRED' ||
+            data.code === 'TOKEN_INVALID' ||
+            data.code === 'UNAUTHENTICATED' ||
+            data.message?.includes('jwt expired') ||
+            data.message?.includes('token') ||
+            data.message?.includes('认证')) {
+          this.handleAuthError(data.code || 'AUTH_ERROR');
+        }
         throw new ApiError(response.status, data.message || 'API请求失败', data);
       }
 
@@ -151,12 +162,52 @@ class ApiClient {
     return !!this.token;
   }
 
-  // 预订相关API (需要后端实现)
+  private handleAuthError(errorCode: string = 'AUTH_ERROR') {
+    // 清除本地token和用户信息
+    this.removeToken();
+    localStorage.removeItem('user_info');
+    
+    // 根据错误代码设置不同的消息
+    let message = 'JWT已过期，请重新登录';
+    switch (errorCode) {
+      case 'TOKEN_EXPIRED':
+        message = 'JWT已过期，请重新登录';
+        break;
+      case 'TOKEN_INVALID':
+        message = 'JWT无效，请重新登录';
+        break;
+      case 'USER_NOT_FOUND':
+        message = '用户不存在，请重新登录';
+        break;
+      case 'UNAUTHENTICATED':
+        message = '需要用户认证，请登录';
+        break;
+      default:
+        message = '认证失败，请重新登录';
+    }
+    
+    // 触发全局认证错误事件
+    window.dispatchEvent(new CustomEvent('auth-error', { 
+      detail: { 
+        message,
+        code: errorCode
+      } 
+    }));
+  }
+
+  // 预订相关API - 使用GraphQL实现
   async createReservation(reservationData: ReservationFormData): Promise<ApiResponse<Reservation>> {
-    return this.request<Reservation>('/reservations', {
-      method: 'POST',
-      body: JSON.stringify(reservationData),
-    });
+    // 原REST API调用（已注释）
+    // return this.request<Reservation>('/reservations', {
+    //   method: 'POST',
+    //   body: JSON.stringify(reservationData),
+    // });
+
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.createReservation(reservationData);
   }
 
   async getUserReservations(options?: {
@@ -164,12 +215,20 @@ class ApiClient {
     limit?: number;
     status?: string;
   }): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
-    const params = new URLSearchParams();
-    if (options?.page) params.append('page', options.page.toString());
-    if (options?.limit) params.append('limit', options.limit.toString());
-    if (options?.status) params.append('status', options.status);
+    // 原REST API调用（已注释）
+    // const params = new URLSearchParams();
+    // if (options?.page) params.append('page', options.page.toString());
+    // if (options?.limit) params.append('limit', options.limit.toString());
+    // if (options?.status) params.append('status', options.status);
+    // const queryString = params.toString();
+    // const url = queryString ? `/reservations?${queryString}` : '/reservations';
+    // return this.request<PaginatedResponse<Reservation>>(url);
 
-    return this.request<PaginatedResponse<Reservation>>(`/reservations?${params.toString()}`);
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.getUserReservations(options);
   }
 
   async getAllReservations(options?: {
@@ -182,31 +241,50 @@ class ApiClient {
     sortBy?: string;
     sortOrder?: string;
   }): Promise<ApiResponse<PaginatedResponse<Reservation>>> {
-    const params = new URLSearchParams();
-    if (options?.page) params.append('page', options.page.toString());
-    if (options?.limit) params.append('limit', options.limit.toString());
-    if (options?.status) params.append('status', options.status);
-    if (options?.startDate) params.append('startDate', options.startDate);
-    if (options?.endDate) params.append('endDate', options.endDate);
-    if (options?.searchTerm) params.append('search', options.searchTerm);
-    if (options?.sortBy) params.append('sortBy', options.sortBy);
-    if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+    // 原REST API调用（已注释）
+    // const params = new URLSearchParams();
+    // if (options?.page) params.append('page', options.page.toString());
+    // if (options?.limit) params.append('limit', options.limit.toString());
+    // if (options?.status) params.append('status', options.status);
+    // if (options?.startDate) params.append('startDate', options.startDate);
+    // if (options?.endDate) params.append('endDate', options.endDate);
+    // if (options?.searchTerm) params.append('search', options.searchTerm);
+    // if (options?.sortBy) params.append('sortBy', options.sortBy);
+    // if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+    // const queryString = params.toString();
+    // const url = queryString ? `/reservations/admin?${queryString}` : '/reservations/admin';
+    // return this.request<PaginatedResponse<Reservation>>(url);
 
-    const queryString = params.toString();
-    const url = queryString ? `/reservations/admin?${queryString}` : '/reservations/admin';
-    
-    return this.request<PaginatedResponse<Reservation>>(url);
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.getAllReservations(options);
   }
 
   async getReservationById(id: string): Promise<ApiResponse<Reservation>> {
-    return this.request<Reservation>(`/reservations/${id}`);
+    // 原REST API调用（已注释）
+    // return this.request<Reservation>(`/reservations/${id}`);
+
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.getReservationById(id);
   }
 
   async updateReservation(id: string, updates: Partial<ReservationFormData>): Promise<ApiResponse<Reservation>> {
-    return this.request<Reservation>(`/reservations/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
+    // 原REST API调用（已注释）
+    // return this.request<Reservation>(`/reservations/${id}`, {
+    //   method: 'PUT',
+    //   body: JSON.stringify(updates),
+    // });
+
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.updateReservation(id, updates);
   }
 
   async updateReservationStatus(
@@ -214,17 +292,46 @@ class ApiClient {
     status: string,
     reason?: string
   ): Promise<ApiResponse<Reservation>> {
-    return this.request<Reservation>(`/reservations/${id}/status`, {
-      method: 'PUT',
-      body: JSON.stringify({ status, reason }),
-    });
+    // 原REST API调用（已注释）
+    // return this.request<Reservation>(`/reservations/${id}/status`, {
+    //   method: 'PUT',
+    //   body: JSON.stringify({ status, reason }),
+    // });
+
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.updateReservationStatus(id, status, reason);
   }
 
   async cancelReservation(id: string, reason: string): Promise<ApiResponse<Reservation>> {
-    return this.request<Reservation>(`/reservations/${id}/cancel`, {
-      method: 'PUT',
-      body: JSON.stringify({ reason }),
-    });
+    // 原REST API调用（已注释）
+    // return this.request<Reservation>(`/reservations/${id}/cancel`, {
+    //   method: 'PUT',
+    //   body: JSON.stringify({ reason }),
+    // });
+
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.cancelReservation(id, reason);
+  }
+
+  async getTodayReservations(status?: string): Promise<ApiResponse<Reservation[]>> {
+    // 原REST API调用（已注释）
+    // const params = new URLSearchParams();
+    // if (status) params.append('status', status);
+    // const queryString = params.toString();
+    // const url = queryString ? `/reservations/today?${queryString}` : '/reservations/today';
+    // return this.request<Reservation[]>(url);
+
+    // 使用GraphQL实现
+    if (this.token) {
+      graphqlClient.setToken(this.token);
+    }
+    return await graphqlClient.getTodayReservations(status);
   }
 }
 

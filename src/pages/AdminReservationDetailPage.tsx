@@ -165,22 +165,22 @@ const AdminReservationDetailPage: Component = () => {
                   <div class="info-grid">
                     <div class="info-item">
                       <span class="label">客人姓名</span>
-                      <span class="value">{res().guestName}</span>
+                      <span class="value">{res().guestName || '未提供'}</span>
                     </div>
 
                     <div class="info-item">
                       <span class="label">到达时间</span>
-                      <span class="value">{formatDateTime(res().arrivalTime)}</span>
+                      <span class="value">{res().arrivalTime ? formatDateTime(res().arrivalTime) : '未提供'}</span>
                     </div>
 
                     <div class="info-item">
                       <span class="label">桌位人数</span>
-                      <span class="value">{res().tableSize}人</span>
+                      <span class="value">{res().tableSize ? `${res().tableSize}人` : '未提供'}</span>
                     </div>
 
                     <div class="info-item">
                       <span class="label">预订时间</span>
-                      <span class="value">{formatDateTime(res().createdAt)}</span>
+                      <span class="value">{res().createdAt ? formatDateTime(res().createdAt) : '未提供'}</span>
                     </div>
                   </div>
                 </div>
@@ -196,16 +196,26 @@ const AdminReservationDetailPage: Component = () => {
                   <div class="contact-grid">
                     <div class="contact-item">
                       <span class="label">联系电话</span>
-                      <a href={formatPhoneLink(res().phoneNumber)} class="contact-link">
-                        📞 {res().phoneNumber}
-                      </a>
+                      <Show 
+                        when={res().phoneNumber}
+                        fallback={<span class="contact-value">未提供</span>}
+                      >
+                        <a href={formatPhoneLink(res().phoneNumber)} class="contact-link">
+                          📞 {res().phoneNumber}
+                        </a>
+                      </Show>
                     </div>
 
                     <div class="contact-item">
                       <span class="label">邮箱地址</span>
-                      <a href={formatEmailLink(res().email)} class="contact-link">
-                        ✉️ {res().email}
-                      </a>
+                      <Show 
+                        when={res().email}
+                        fallback={<span class="contact-value">未提供</span>}
+                      >
+                        <a href={formatEmailLink(res().email)} class="contact-link">
+                          ✉️ {res().email}
+                        </a>
+                      </Show>
                     </div>
                   </div>
                 </div>
@@ -225,7 +235,7 @@ const AdminReservationDetailPage: Component = () => {
               </Show>
 
               {/* 状态历史卡片 */}
-              <Show when={res().statusHistory && res().statusHistory.length > 0}>
+              <Show when={res().statusHistory?.length}>
                 <div class="detail-card card">
                   <div class="card-header">
                     <h2>状态历史</h2>
@@ -233,7 +243,7 @@ const AdminReservationDetailPage: Component = () => {
 
                   <div class="card-body">
                     <div class="status-history">
-                      <For each={res().statusHistory}>
+                      <For each={res().statusHistory || []}>
                         {(history) => (
                           <div class="history-item">
                             <div class="history-status">

@@ -1,5 +1,5 @@
 import { Component, Show } from 'solid-js';
-import { Routes, Route, Navigate } from '@solidjs/router';
+import { Route, Navigate } from '@solidjs/router';
 import { useAuth } from '@/contexts/AuthContext';
 
 // 页面组件
@@ -58,7 +58,7 @@ const PublicRoute: Component<{ children: any }> = (props) => {
 
 const AppRoutes: Component = () => {
   return (
-    <Routes>
+    <>
       {/* 公共路由 */}
       <Route path="/login" component={() => (
         <PublicRoute>
@@ -111,7 +111,7 @@ const AppRoutes: Component = () => {
           </div>
         </div>
       )} />
-    </Routes>
+    </>
   );
 };
 

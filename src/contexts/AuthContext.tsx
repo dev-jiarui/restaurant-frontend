@@ -1,6 +1,7 @@
-import { createContext, useContext, createSignal, createEffect, ParentComponent } from 'solid-js';
+import { createContext, useContext, createSignal, createEffect, ParentComponent, onCleanup } from 'solid-js';
 import { User } from '@/types';
 import { apiClient } from '@/services/api';
+import { showToast } from '@/components/Toast';
 
 interface AuthContextType {
   user: () => User | null;
@@ -16,6 +17,31 @@ const AuthContext = createContext<AuthContextType>();
 export const AuthProvider: ParentComponent = (props) => {
   const [user, setUser] = createSignal<User | null>(null);
   const [isLoading, setIsLoading] = createSignal(true);
+
+  // 监听认证错误事件
+  createEffect(() => {
+    const handleAuthError = (event: CustomEvent) => {
+      console.warn('认证错误:', event.detail.message);
+      // 显示Toast通知
+      showToast(event.detail.message || 'JWT已过期，请重新登录', 'warning', 6000);
+      // 自动登出
+      logout();
+      // 触发路由跳转事件（由路由组件处理）
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('auth-redirect', { 
+          detail: { path: '/login' } 
+        }));
+      }, 1000);
+    };
+
+    // 添加事件监听器
+    window.addEventListener('auth-error', handleAuthError as EventListener);
+
+    // 清理函数
+    onCleanup(() => {
+      window.removeEventListener('auth-error', handleAuthError as EventListener);
+    });
+  });
 
   // 初始化时检查本地存储的token
   createEffect(() => {

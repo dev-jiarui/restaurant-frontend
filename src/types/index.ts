@@ -9,6 +9,14 @@ export interface User {
 // 预订状态枚举
 export type ReservationStatus = 'Requested' | 'Approved' | 'Cancelled' | 'Completed';
 
+// 状态历史记录
+export interface StatusHistory {
+  status: ReservationStatus;
+  reason?: string;
+  changedAt: string;
+  changedBy?: string;
+}
+
 // 预订数据模型
 export interface Reservation {
   id: string;
@@ -22,6 +30,9 @@ export interface Reservation {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  statusHistory?: StatusHistory[];
+  canEdit?: boolean;
+  canCancel?: boolean;
 }
 
 // API响应类型
